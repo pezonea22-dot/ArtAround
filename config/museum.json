@@ -1,0 +1,16 @@
+{
+  "id": "pinacoteca-nazionale-bologna",
+  "name": "Pinacoteca Nazionale di Bologna",
+  "shortName": "Pinacoteca",
+  "primaryColor": "#8B1A1A",
+  "logo": "/config/logo.png",
+  "address": "Via delle Belle Arti 56, Bologna",
+  "ticketPrice": "6€",
+  "openingHours": "Martedì–domenica 9:00–19:00",
+  "places": {
+    "exit": "Uscita principale al piano terra",
+    "toilette": "Piano terra vicino all'ingresso",
+    "bar": "Non disponibile",
+    "shop": "Ingresso principale"
+  }
+}
