@@ -1,16 +1,17 @@
 {
-  "id": "pinacoteca-nazionale-bologna",
-  "name": "Pinacoteca Nazionale di Bologna",
-  "shortName": "Pinacoteca",
-  "primaryColor": "#8B1A1A",
-  "logo": "/config/logo.png",
-  "address": "Via delle Belle Arti 56, Bologna",
-  "ticketPrice": "6€",
-  "openingHours": "Martedì–domenica 9:00–19:00",
+  "id": "galleria-estense",
+  "name": "Galleria Estense",
+  "shortName": "Estense",
+  "primaryColor": "#e91e8c",
+  "address": "Largo Porta Sant'Agostino 337, Modena",
+  "ticketPrice": "10€, ridotto 5€",
+  "openingHours": "Martedì–domenica 8:15–19:30",
   "places": {
-    "exit": "Uscita principale al piano terra",
-    "toilette": "Piano terra vicino all'ingresso",
-    "bar": "Non disponibile",
-    "shop": "Ingresso principale"
+    "uscita": "Uscita principale al piano terra, vicino all'ingresso da Largo Porta Sant'Agostino.",
+    "toilette": "Bagni al piano terra, vicino all'ingresso principale.",
+    "bar": "Non è presente un bar interno. Il più vicino è in Piazza Roma.",
+    "shop": "Shop museale all'ingresso principale, piano terra.",
+    "ostacoli": "Presenza di gradini tra alcune sale. Ascensore disponibile vicino all'ingresso.",
+    "emergenza": "Uscite di emergenza segnalate in ogni sala con cartelli verdi."
   }
 }
