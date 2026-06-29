@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const Item = require('../models/Item')
 const Visit = require('../models/Visit')
+const auth = require('../middleware/auth')
 
 // GET /api/marketplace/items?level=&duration=&search=
 router.get('/items', async (req, res) => {
@@ -34,5 +35,25 @@ router.get('/visits', async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
-
+router.post('/items/:id/adopt', auth, async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id)
+    if (!item) return res.status(404).json({ error: 'Item non trovato' })
+    if (!item.isPublic) return res.status(403).json({ error: 'Item non pubblico' })
+    const adopted = await Item.create({
+      objectId: item.objectId,
+      text:     item.text,
+      duration: item.duration,
+      level:    item.level,
+      language: item.language,
+      author:   req.user.id,
+      license:  item.license,
+      price:    0,
+      isPublic: false,
+    })
+    res.status(201).json(adopted)
+  } catch(err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 module.exports = router

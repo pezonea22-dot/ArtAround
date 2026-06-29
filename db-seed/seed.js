@@ -115,14 +115,17 @@ async function seed() {
     { objectId: obj('estense-005'), text: 'Il Compianto sul Cristo morto del Guercino: dolore e luce drammatica.', duration: '3s', level: 'semplice', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-005'), text: 'Il Guercino dipinse questo Compianto nel 1617, quando aveva solo vent\'anni. La scena mostra la Madonna e san Giovanni che piangono sul corpo di Cristo. Il forte contrasto tra ombre scure e zone illuminate è già maturo.', duration: '15s', level: 'medio', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-005'), text: 'Giovanni Francesco Barbieri detto il Guercino realizzò quest\'opera giovanile nel 1617, rivelando già una padronanza del chiaroscuro di ascendenza caravaggesca. La composizione è piramidale, con il corpo di Cristo al centro, sorretto da angeli e compianto dalla Vergine e da san Giovanni.', duration: '1min', level: 'avanzato', author: autore2._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-005'), text: 'Guarda quest\'uomo che dorme... no, non dorme. È Gesù e tutti lo piangono perché gli vogliono bene. Il pittore si chiamava Guercino ed era bravissimo a dipingere le facce tristi.', duration: '15s', level: 'infantile', author: autore2._id, license: 'free', isPublic: true },
     // Dosso Dossi
     { objectId: obj('estense-006'), text: 'Dosso Dossi dipinse divinità mitologiche con colori vivaci e fantastici.', duration: '3s', level: 'semplice', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-006'), text: 'Dosso Dossi era il pittore preferito della corte estense di Ferrara. Questo dipinto raffigura Giove e Semele, tratto dalle Metamorfosi di Ovidio. I colori sono intensi e la composizione movimentata.', duration: '15s', level: 'medio', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-006'), text: 'Dosso Dossi fu il pittore di corte degli Este a Ferrara. Il soggetto, tratto dalle Metamorfosi di Ovidio, racconta come Semele, amante di Giove, chiese di vedere il dio nella sua forma reale e ne fu fulminata. Ariosto, che frequentava la stessa corte, lo celebrò nell\'Orlando Furioso.', duration: '1min', level: 'avanzato', author: autore1._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-006'), text: 'Questo è Giove, il re degli dei! È fortissimo e lancia i fulmini. Dosso Dossi lo ha dipinto con colori brillanti perché i re devono essere sempre belli e potenti!', duration: '15s', level: 'infantile', author: autore1._id, license: 'free', isPublic: true },
     // Tintoretto
     { objectId: obj('estense-007'), text: 'Un ritratto veneziano di Tintoretto: potente e psicologico.', duration: '3s', level: 'semplice', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-007'), text: 'Tintoretto è uno dei grandi pittori veneziani del Cinquecento. Questo ritratto è caratterizzato da una pennellata veloce e dalla tipica luce che emerge dallo sfondo scuro. Il soggetto ci guarda con intensità.', duration: '15s', level: 'medio', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-007'), text: 'Jacopo Robusti detto il Tintoretto è tra i massimi esponenti del tardo Rinascimento veneziano. I suoi ritratti si distinguono per la pennellata rapida e nervosa, lo sfondo scuro da cui emerge il soggetto grazie a una luce radente, e la profondità psicologica del personaggio.', duration: '1min', level: 'avanzato', author: autore2._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-007'), text: 'Guarda questo signore serio! Non sorride, ma ha gli occhi molto vivi. Il pittore Tintoretto era bravissimo a dipingere le persone come se fossero vere vere!', duration: '15s', level: 'infantile', author: autore1._id, license: 'free', isPublic: true },
     // Correggio
     { objectId: obj('estense-008'), text: 'Correggio dipinse Madonne dolcissime, con luci morbide e calde.', duration: '3s', level: 'semplice', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-008'), text: 'Antonio Allegri detto il Correggio rivoluzionò la pittura emiliana con il suo stile morbido e sentimentale. Il piccolo Gesù gioca con Giovannino in una scena tenera e familiare, avvolta da una luce dorata.', duration: '15s', level: 'medio', author: autore2._id, license: 'free', isPublic: true },
@@ -132,18 +135,22 @@ async function seed() {
     { objectId: obj('estense-009'), text: 'Nicolò dell\'Abate: colori vivaci e storie religiose eleganti.', duration: '3s', level: 'semplice', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-009'), text: 'Nicolò dell\'Abate nacque proprio a Modena ed è uno degli artisti più importanti del Rinascimento emiliano. I colori sono brillanti, i gesti teatrali, i panneggi elaborati: uno stile elegante che piaceva alle corti.', duration: '15s', level: 'medio', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-009'), text: 'Nicolò dell\'Abate è il grande protagonista del Rinascimento modenese prima di trasferirsi in Francia, dove diventerà uno dei fondatori della Scuola di Fontainebleau. Il suo stile fonde la lezione parmigianinesca con una narratività vivace e una tendenza al decorativo.', duration: '1min', level: 'avanzato', author: autore1._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-009'), text: 'Questi uomini stanno tutti intorno a una persona importante. Nicolò dell\'Abate era di Modena, proprio come te! Ha usato colori bellissimi per questa storia.', duration: '15s', level: 'infantile', author: autore2._id, license: 'free', isPublic: true },
     // El Greco
     { objectId: obj('estense-010'), text: 'El Greco: un pittore greco che lavorò in Spagna con uno stile unico.', duration: '3s', level: 'semplice', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-010'), text: 'El Greco era originario di Creta e si formò a Venezia prima di stabilirsi a Toledo. Questo ritratto raffigura Giulio Clovio, miniaturista che El Greco conobbe a Roma. Lo stile è già inconfondibile: colori freddi e figure intense.', duration: '15s', level: 'medio', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-010'), text: 'Doménikos Theotokópoulos detto El Greco realizzò questo ritratto di Giulio Clovio probabilmente intorno al 1571, durante il soggiorno romano. È uno dei rarissimi ritratti del periodo italiano di El Greco, e mostra già la palette fredda e argentea e la tensione psicologica del suo stile maturo.', duration: '1min', level: 'avanzato', author: autore2._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-010'), text: 'Quest\'uomo si chiama Giulio e teneva in mano un libro con disegni piccoli piccoli! El Greco lo ha dipinto con colori freddi come il ghiaccio.', duration: '15s', level: 'infantile', author: autore1._id, license: 'free', isPublic: true },
     // Ludovico Carracci
     { objectId: obj('estense-011'), text: 'Ludovico Carracci: fondatore dell\'Accademia bolognese degli Incamminati.', duration: '3s', level: 'semplice', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-011'), text: 'Ludovico Carracci, insieme ai cugini Annibale e Agostino, fondò a Bologna l\'Accademia degli Incamminati, che rivoluzionò la pittura italiana di fine Cinquecento reagendo contro i manierismi artificiali.', duration: '15s', level: 'medio', author: autore2._id, license: 'free', isPublic: true },
     { objectId: obj('estense-011'), text: 'Ludovico Carracci è la figura centrale della riforma pittorica bolognese di fine Cinquecento. L\'Accademia degli Incamminati teorizzava un ritorno allo studio dal naturale e ai grandi modelli del Rinascimento contro l\'artificiosità del manierismo tardo. L\'influenza dei Carracci fu immensa: da Guercino a Domenichino a Reni, tutta la pittura bolognese del Seicento si sviluppò nel solco di questa riforma.', duration: '1min', level: 'avanzato', author: autore1._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-011'), text: 'Ecco la Madonna con il suo bambino Gesù! Intorno ci sono i santi che li proteggono. Ludovico Carracci era di Bologna ed era molto famoso!', duration: '15s', level: 'infantile', author: autore2._id, license: 'free', isPublic: true },
     // Guido Reni
     { objectId: obj('estense-012'), text: 'Guido Reni dipinse eroi mitologici con eleganza e grazia classica.', duration: '3s', level: 'semplice', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-012'), text: 'Guido Reni è uno dei grandi pittori bolognesi del Seicento. Questa scena mostra Ercole che solleva Anteo da terra, privandolo della forza che traeva dal contatto con la madre Terra. Lo stile è classico e armonioso.', duration: '15s', level: 'medio', author: autore1._id, license: 'free', isPublic: true },
     { objectId: obj('estense-012'), text: 'Guido Reni fu l\'artista più celebrato e meglio pagato del suo tempo. La lotta tra Ercole e Anteo è un soggetto mitologico tratto dalle Metamorfosi: Anteo, figlio di Gaia, recuperava le forze toccando la terra, e Ercole lo sconfisse sollevandolo in aria. La composizione di Reni è torsionale e scultorea, con evidente debito verso l\'antico.', duration: '1min', level: 'avanzato', author: autore2._id, license: 'free', isPublic: true },
+    { objectId: obj('estense-012'), text: 'Ercole è fortissimo! Sta sollevando Anteo da terra perché Anteo diventava ancora più forte quando toccava il suolo. Guido Reni ha dipinto i muscoli benissimo!', duration: '15s', level: 'infantile', author: autore1._id, license: 'free', isPublic: true },
   ])
   console.log('Item creati:', items.length)
 
@@ -224,7 +231,35 @@ async function seed() {
         { objectId: obj('estense-010'), items: getItems('estense-010', ['semplice']) },
         { objectId: obj('estense-012'), items: getItems('estense-012', ['semplice']) },
       ]
-    }
+    },
+    {
+      title: 'Primo approccio alla Galleria',
+      description: 'Percorso introduttivo per chi visita la Galleria Estense per la prima volta. Testi brevi e chiari sulle opere principali.',
+      museumId: 'galleria-estense',
+      author: autore2._id,
+      targetLevel: 'semplice',
+      estimatedDuration: '60 min',
+      isPublic: true,
+      logistics: [
+        { text: 'Ingresso da Via Emilia Este 38. Biglietto 10€, ridotto 5€.', afterStepIndex: -1 },
+        { text: 'Proseguire verso la sala 5 al piano inferiore.', afterStepIndex: 1 },
+      ],
+      steps: [
+        { objectId: obj('estense-001'), items: getItems('estense-001', ['semplice']) },
+        { objectId: obj('estense-002'), items: getItems('estense-002', ['semplice']) },
+        { objectId: obj('estense-003'), items: getItems('estense-003', ['semplice']) },
+        { objectId: obj('estense-004'), items: getItems('estense-004', ['semplice']) },
+        { objectId: obj('estense-008'), items: getItems('estense-008', ['semplice']) },
+        { objectId: obj('estense-006'), items: getItems('estense-006', ['semplice']) },
+        { objectId: obj('estense-007'), items: getItems('estense-007', ['semplice']) },
+        { objectId: obj('estense-010'), items: getItems('estense-010', ['semplice']) },
+        { objectId: obj('estense-005'), items: getItems('estense-005', ['semplice']) },
+        { objectId: obj('estense-011'), items: getItems('estense-011', ['semplice']) },
+        { objectId: obj('estense-012'), items: getItems('estense-012', ['semplice']) },
+        { objectId: obj('estense-009'), items: getItems('estense-009', ['semplice']) },
+      ]
+    },
+    
   ])
   console.log('Visite create: 3')
   console.log('✅ Seed completato!')

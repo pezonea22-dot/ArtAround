@@ -4,12 +4,12 @@ const Item = require('../models/Item')
 const auth = require('../middleware/auth')
 
 // GET /api/visits?museumId=&targetLevel=
-router.get('/', async (req, res) => {
+
+
+// GET /api/visits/mine — visite dell'utente autenticato
+router.get('/mine', auth, async (req, res) => {
   try {
-    const filter = { isPublic: true }
-    if (req.query.museumId) filter.museumId = req.query.museumId
-    if (req.query.targetLevel) filter.targetLevel = req.query.targetLevel
-    const visits = await Visit.find(filter)
+    const visits = await Visit.find({ author: req.user.id })
       .populate('author', 'username')
       .select('-steps')
       .sort({ createdAt: -1 })

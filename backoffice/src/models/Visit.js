@@ -7,7 +7,8 @@ const logisticSchema = new mongoose.Schema({
 
 const visitStepSchema = new mongoose.Schema({
   objectId: { type: mongoose.Schema.Types.ObjectId, ref: 'MuseumObject' },
-  items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }]
+  items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }],
+  optionalItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }]
 })
 
 const visitSchema = new mongoose.Schema({

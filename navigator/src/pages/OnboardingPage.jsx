@@ -64,9 +64,9 @@ export default function OnboardingPage() {
                 textAlign: 'left',
                 transition: 'all .15s',
               }}>
-                <div style={{ fontSize: 22, marginBottom: 6 }}>{l.emoji}</div>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{l.label}</div>
-                <div style={{ fontSize: 11, color: active ? '#C8A96E' : '#7A6E62', lineHeight: 1.4 }}>{l.desc}</div>
+                <div style={{ fontSize: 22, marginBottom: 6, textAlign: 'center' }}>{l.emoji}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2, textAlign: 'center' }}>{l.label}</div>
+                <div style={{ fontSize: 11, color: active ? '#C8A96E' : '#7A6E62', lineHeight: 1.4, textAlign: 'center' }}>{l.desc}</div>
               </button>
             )
           })}

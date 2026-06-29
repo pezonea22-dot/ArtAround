@@ -2,11 +2,15 @@ const router = require('express').Router()
 const Item = require('../models/Item')
 const auth = require('../middleware/auth')
 
-// GET /api/items?objectId=&level=&duration=&isPublic=
+
+
+// GET /api/items/:id
 router.get('/', async (req, res) => {
   try {
     const filter = {}
-    if (req.query.objectId) filter.objectId = req.query.objectId
+    if (req.query.objectId && req.query.objectId !== 'null' && req.query.objectId !== 'undefined') {
+      filter.objectId = req.query.objectId
+    }
     if (req.query.level) filter.level = req.query.level
     if (req.query.duration) filter.duration = req.query.duration
     if (req.query.isPublic) filter.isPublic = req.query.isPublic === 'true'
@@ -20,19 +24,6 @@ router.get('/', async (req, res) => {
   }
 })
 
-// GET /api/items/:id
-router.get('/:id', async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.id)
-      .populate('author', 'username')
-      .populate('objectId', 'title artist')
-    if (!item) return res.status(404).json({ error: 'Item non trovato' })
-    res.json(item)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
 // POST /api/items (solo autori)
 router.post('/', auth, async (req, res) => {
   try {
@@ -41,6 +32,19 @@ router.post('/', auth, async (req, res) => {
     res.status(201).json(item)
   } catch (err) {
     res.status(400).json({ error: err.message })
+  }
+})
+
+// GET /api/items/mine — solo i miei item
+router.get('/mine', auth, async (req, res) => {
+  try {
+    const items = await Item.find({ author: req.user.id })
+      .populate('author', 'username')
+      .populate('objectId', 'title artist')
+      .sort({ level: 1, duration: 1 })
+    res.json(items)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
   }
 })
 
