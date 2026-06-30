@@ -30,6 +30,11 @@ router.get('/:id', async (req, res) => {
         model: 'Item',
         populate: { path: 'author', select: 'username' }
       })
+      .populate({
+        path: 'steps.optionalItems',
+        model: 'Item',
+        populate: { path: 'author', select: 'username' }
+      })
     if (!visit) return res.status(404).json({ error: 'Visita non trovata' })
     
     // log temporaneo
@@ -59,7 +64,20 @@ router.put('/:id', auth, async (req, res) => {
     if (!visit) return res.status(404).json({ error: 'Visita non trovata' })
     if (visit.author.toString() !== req.user.id) return res.status(403).json({ error: 'Non autorizzato' })
     const updated = await Visit.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    res.json(updated)
+    const populated = await Visit.findById(updated._id)
+      .populate('author', 'username')
+      .populate({ path: 'steps.objectId' })
+      .populate({ 
+        path: 'steps.items',
+        model: 'Item',
+        populate: { path: 'author', select: 'username' }
+      })
+      .populate({
+        path: 'steps.optionalItems',
+        model: 'Item',
+        populate: { path: 'author', select: 'username' }
+      })
+    res.json(populated)
   } catch (err) {
     res.status(400).json({ error: err.message })
   }

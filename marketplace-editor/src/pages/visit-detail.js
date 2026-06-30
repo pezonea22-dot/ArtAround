@@ -14,18 +14,13 @@ const levelOrder     = ['infantile','semplice','medio','avanzato']
 const durationOrder  = ['3s','15s','1min','4min']
 
 let visit        = null
-let allItems     = {}
 let selectedStep = 0
 let msg = null
+let adoptMsg = null
 
 async function load() {
   try {
     visit = await api.get(`/api/visits/${id}`)
-    await Promise.all(visit.steps.map(async s => {
-      const oid = s.objectId?._id || s.objectId
-      if (!oid) return
-      allItems[oid] = await api.get(`/api/items?objectId=${oid}`)
-    }))
     render()
   } catch(e) {
     document.getElementById('app').innerHTML = `
@@ -70,8 +65,7 @@ function itemCard(item) {
 function render() {
   const step   = visit.steps[selectedStep]
   const object = step?.objectId
-  const oid    = object?._id || object
-  const items  = allItems[oid] || []
+  const items  = [...(step?.items || []), ...(step?.optionalItems || [])]
   const sorted = [...items].sort((a,b) =>
     levelOrder.indexOf(a.level) - levelOrder.indexOf(b.level) ||
     durationOrder.indexOf(a.duration) - durationOrder.indexOf(b.duration)
@@ -112,7 +106,7 @@ function render() {
           ${visit.steps.map((s,i) => {
             const cur   = i === selectedStep
             const obj   = s.objectId
-            const count = (allItems[obj?._id||obj]||[]).length
+            const count = (s.items?.length || 0) + (s.optionalItems?.length || 0)
             return `
               <button onclick="window._selectStep(${i})" style="
                 display:flex;align-items:center;gap:12px;width:100%;
@@ -169,12 +163,23 @@ function render() {
         </div>
       </div>
     </div>
+
+    ${adoptMsg ? `
+      <div class="modal-overlay" onclick="if(event.target===this)closeAdoptMsg()">
+        <div class="modal" style="text-align:center">
+          <p style="font-size:15px;color:var(--cream);line-height:1.6;margin-bottom:20px">${adoptMsg}</p>
+          <button onclick="closeAdoptMsg()" class="btn btn-gold" style="width:100%">OK</button>
+        </div>
+      </div>
+    ` : ''}
   `
 }
+function closeAdoptMsg() { adoptMsg = null; render() }
+
 async function adoptItem(itemId) {
   try {
     await api.post(`/api/marketplace/items/${itemId}/adopt`, {})
-    msg = { type: 'success', text: 'Item adottato — lo trovi in "I miei item".' }
+    adoptMsg = 'Item copiato'
     render()
   } catch(e) {
     msg = { type: 'error', text: e.message }
@@ -182,6 +187,7 @@ async function adoptItem(itemId) {
   }
 }
 window.adoptItem = adoptItem
+window.closeAdoptMsg = closeAdoptMsg
 
 window._selectStep = i => { selectedStep = i; render() }
 

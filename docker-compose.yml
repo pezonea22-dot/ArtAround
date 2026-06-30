@@ -1,0 +1,55 @@
+
+
+services:
+  mongodb:
+    image: mongo:8
+    container_name: artaround-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - artaround
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backoffice:
+    build: ./backoffice
+    container_name: artaround-backoffice
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGO_URI=mongodb://mongodb:27017/artaround
+      - JWT_SECRET=supersegreto123
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - artaround
+
+  navigator:
+    build: ./navigator
+    container_name: artaround-navigator
+    ports:
+      - "5173:5173"
+    networks:
+      - artaround
+
+  marketplace:
+    build: ./marketplace-editor
+    container_name: artaround-marketplace
+    ports:
+      - "3002:3002"
+    networks:
+      - artaround
+
+volumes:
+  mongodb_data:
+
+networks:
+  artaround:
+    driver: bridge

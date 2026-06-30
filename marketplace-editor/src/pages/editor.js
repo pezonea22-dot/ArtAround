@@ -33,8 +33,8 @@ async function saveVisit(e) {
     targetLevel:       form.targetLevel.value,
     estimatedDuration: form.estimatedDuration.value,
     isPublic:          form.isPublic.checked,
-    steps:             [],
-    logistics:         [],
+    steps:    editVisit ? (editVisit.steps || []) : [],
+    logistics: editVisit ? (editVisit.logistics || []) : [],
   }
   if (!data.title || !data.targetLevel || !data.estimatedDuration) {
     msg = { type: 'error', text: 'Compila tutti i campi obbligatori.' }

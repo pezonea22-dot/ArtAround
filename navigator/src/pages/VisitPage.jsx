@@ -48,8 +48,9 @@ export default function VisitPage() {
   const [showMap, setShowMap]       = useState(false)
   const [logistic, setLogistic]     = useState(null)
   const [infoMsg, setInfoMsg]       = useState(null)
-  const [allItems, setAllItems]     = useState({})
+
   const [museumPlaces, setPlaces]   = useState({})
+  const [showExtra, setShowExtra]   = useState(false)
   const [voiceOn, setVoiceOn]       = useState(false)
   const [voiceHint, setVoiceHint]   = useState('')
   const synthRef = useRef(window.speechSynthesis)
@@ -64,12 +65,7 @@ export default function VisitPage() {
       setPlaces(config.places || {})
       const intro = r.data.logistics?.find(l => l.afterStepIndex === -1)
       if (intro) setLogistic(intro.text)
-      const map = {}
-      await Promise.all(r.data.steps.map(async s => {
-        const res = await api.get(`/api/items?objectId=${s.objectId._id}`)
-        map[s.objectId._id] = res.data
-      }))
-      setAllItems(map)
+
     }).finally(() => setLoading(false))
     return () => { synthRef.current.cancel(); recRef.current?.stop() }
   }, [id])
@@ -109,9 +105,13 @@ export default function VisitPage() {
 
   const step     = visit.steps[stepIndex]
   const object   = step?.objectId
-  const oid      = object?._id
-  const items    = allItems[oid] || step?.items || []
+  const items    = step?.items || []
+  const optionalItems = step?.optionalItems || []
   const curItem  = pickItem(items, currentLevel)
+  const currentIdx  = levelOrder.indexOf(currentLevel)
+  const hasLevel    = l => items.some(i => i.level === l)
+  const canGoLess   = currentIdx > 0 && hasLevel(levelOrder[currentIdx - 1])
+  const canGoMore   = currentIdx < 3 && hasLevel(levelOrder[currentIdx + 1])
   const isFirst  = stepIndex === 0
   const isLast   = stepIndex === visit.steps.length - 1
 
@@ -131,6 +131,8 @@ export default function VisitPage() {
 
   const handleCmd = cmd => {
     if (!cmd) return
+    if (cmd === 'more' && !canGoMore) return
+    if (cmd === 'less' && !canGoLess) return
     const actions = {
       next:   goNext,
       prev:   goPrev,
@@ -311,6 +313,40 @@ export default function VisitPage() {
             <p style={{ color: '#7A6E62', fontSize: 13, marginBottom: 20 }}>Nessun testo per questo livello.</p>
           )}
 
+          {/* Approfondimenti */}
+          {optionalItems.length > 0 && (
+            <div style={{ borderTop: '1px solid rgba(200,169,110,0.08)', paddingTop: 16, marginBottom: 16 }}>
+              <button onClick={() => setShowExtra(!showExtra)} style={{
+                width: '100%', padding: '10px 14px', borderRadius: 3, border: '1px solid rgba(200,169,110,0.12)',
+                background: showExtra ? 'rgba(200,169,110,0.06)' : 'transparent',
+                color: '#C8A96E', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+              }}>
+                <span>Approfondimenti ({optionalItems.length})</span>
+                <span style={{ transition: 'transform .2s', transform: showExtra ? 'rotate(180deg)' : 'none' }}>▾</span>
+              </button>
+              {showExtra && optionalItems.map(item => (
+                <div key={item._id} style={{
+                  marginTop: 8, padding: '10px 14px',
+                  border: '1px dashed rgba(200,169,110,0.15)', borderRadius: 3,
+                  background: 'rgba(200,169,110,0.03)'
+                }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 10, color: '#C8A96E', fontWeight: 600 }}>
+                      {levelLabel[item.level] || item.level}
+                    </span>
+                    <span style={{ fontSize: 10, color: '#4A4238' }}>
+                      {parseDuration(item.duration)}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 14, lineHeight: 1.7, color: '#D4C9B8', margin: 0 }}>
+                    {item.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Azioni */}
           <div style={{ borderTop: '1px solid rgba(200,169,110,0.08)', paddingTop: 16, marginBottom: 16 }}>
             <p style={{ fontSize: 10, letterSpacing: '0.1em', color: '#4A4238', textTransform: 'uppercase', marginBottom: 10 }}>Azioni</p>
@@ -322,18 +358,21 @@ export default function VisitPage() {
                 ["Cos'è questo", 'whatis'],
                 ['Non capisco', 'less'],
                 ['Troppo semplice', 'more'],
-              ].map(([label, cmd]) => (
-                <button key={label} onClick={() => handleCmd(cmd)} style={{
+              ].map(([label, cmd]) => {
+                const disabled = (cmd === 'less' && !canGoLess) || (cmd === 'more' && !canGoMore)
+                return (
+                <button key={label} onClick={() => handleCmd(cmd)} disabled={disabled} style={{
                   padding: '10px 6px', borderRadius: 3,
-                  border: '1px solid rgba(200,169,110,0.1)',
+                  border: `1px solid ${disabled ? 'rgba(200,169,110,0.04)' : 'rgba(200,169,110,0.1)'}`,
                   background: 'rgba(255,255,255,0.01)',
-                  color: '#7A6E62', cursor: 'pointer', fontSize: 11,
+                  color: disabled ? '#2A2318' : '#7A6E62', cursor: disabled ? 'not-allowed' : 'pointer', fontSize: 11,
                   lineHeight: 1.3, transition: 'all .15s'
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.3)'; e.currentTarget.style.color = '#C8A96E' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.1)'; e.currentTarget.style.color = '#7A6E62' }}
+                onMouseEnter={e => { if (!disabled) { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.3)'; e.currentTarget.style.color = '#C8A96E' } }}
+                onMouseLeave={e => { if (!disabled) { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.1)'; e.currentTarget.style.color = '#7A6E62' } }}
                 >{label}</button>
-              ))}
+                )
+              })}
             </div>
           </div>
 

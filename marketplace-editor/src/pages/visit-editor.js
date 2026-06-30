@@ -35,24 +35,32 @@ async function load() {
 
 async function addStep(objectId) {
   if (!objectId) return
-  // evita duplicati
   const exists = visit.steps.some(s => (s.objectId?._id || s.objectId) === objectId)
   if (exists) {
     msg = { type: 'error', text: 'Quest\'opera è già nella visita.' }
     render(); return
   }
-  // carica gli item dell'opera se non li abbiamo
   if (!allItems[objectId]) {
     allItems[objectId] = await api.get(`/api/items?objectId=${objectId}`)
   }
-  // prendi l'item più adatto al livello della visita
   const items = allItems[objectId]
-  const best  = items.find(i => i.level === visit.targetLevel) || items[0]
+  if (!items || items.length === 0) {
+    msg = { type: 'error', text: 'Nessun testo disponibile per quest\'opera. Crea prima un item dalla pagina Item.' }
+    render(); return
+  }
+  const best = items.find(i => i.level === visit.targetLevel) || items[0]
   visit.steps.push({
     objectId: objects.find(o => o._id === objectId),
-    items: best ? [best] : []
+    items: [best]
   })
   await saveSteps()
+  await Promise.all(visit.steps.map(async s => {
+    const oid = s.objectId?._id || s.objectId
+    if (oid && !allItems[oid]) {
+      allItems[oid] = await api.get(`/api/items?objectId=${oid}`)
+    }
+  }))
+  render()
 }
 
 async function removeStep(index) {
@@ -71,6 +79,15 @@ async function moveStep(index, direction) {
 }
 
 async function saveSteps() {
+  for (let i = 0; i < visit.steps.length; i++) {
+    const s = visit.steps[i]
+    if (!s.items || s.items.length === 0) {
+      const obj = s.objectId
+      const name = obj?.title || `step ${i + 1}`
+      msg = { type: 'error', text: `"${name}" non ha testi inclusi. Aggiungine almeno uno.` }
+      render(); return
+    }
+  }
   try {
     const data = {
       ...visit,
@@ -181,52 +198,21 @@ function render() {
                         text-transform:uppercase;margin-bottom:8px">
                         Testi inclusi (${(s.items||[]).length})
                       </p>
-                      <!-- Item opzionali -->
-                    <p style="font-size:10px;letter-spacing:.08em;color:var(--faint);
-                    text-transform:uppercase;margin-top:12px;margin-bottom:8px">
-                    Testi opzionali (${(s.optionalItems||[]).length})
-                    </p>
-                    ${(s.optionalItems||[]).map(item => {
-                    const fullItem = items.find(it => it._id === (item._id||item)) || item
-                    return `
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;overflow:hidden;min-width:0;
-                        padding:8px 10px;background:rgba(200,169,110,.03);border-radius:3px;
-                        border:1px dashed rgba(200,169,110,.2)">
-                        <span class="tag ${levelMeta[fullItem.level]?.cls}" style="flex-shrink:0">
-                            ${levelMeta[fullItem.level]?.label||fullItem.level}
-                        </span>
-                        <span class="tag" style="background:rgba(200,169,110,.08);color:var(--gold);flex-shrink:0">
-                            ${durationLabel[fullItem.duration]||fullItem.duration}
-                        </span>
-                        <p style="font-size:12px;color:var(--muted);flex:1;min-width:0;max-width:400px;
-                            white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                            ${fullItem.text||''}
-                        </p>
-                        <button onclick="removeOptionalItem(${i}, '${item._id||item}')"
-                            style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px">✕</button>
-                        </div>
-                    `
-                    }).join('')}
-                    ${items.filter(it =>
-                    !(s.items||[]).some(si => (si._id||si) === it._id) &&
-                    !(s.optionalItems||[]).some(si => (si._id||si) === it._id)
-                    ).length > 0 ? `
-                    <select onchange="addOptionalItem(${i}, this.value); this.value=''"
-                        class="input" style="margin-top:6px;font-size:12px">
-                        <option value="">+ Aggiungi testo opzionale...</option>
-                        ${items
-                        .filter(it =>
-                            !(s.items||[]).some(si => (si._id||si) === it._id) &&
-                            !(s.optionalItems||[]).some(si => (si._id||si) === it._id)
-                        )
-                        .map(it => `
-                            <option value="${it._id}">
-                            ${levelMeta[it.level]?.label} · ${durationLabel[it.duration]} —
-                            ${it.text.substring(0,40)}...
-                            </option>
-                        `).join('')}
-                    </select>
-                    ` : ''}
+
+                      ${items.filter(it => !(s.items||[]).some(si => (si._id||si) === it._id)).length > 0 ? `
+                        <select onchange="addItemToStep(${i}, this.value); this.value=''"
+                          class="input" style="margin-bottom:8px;font-size:12px">
+                          <option value="">+ Aggiungi testo...</option>
+                          ${items
+                            .filter(it => !(s.items||[]).some(si => (si._id||si) === it._id))
+                            .map(it => `
+                              <option value="${it._id}">
+                                ${levelMeta[it.level]?.label} · ${durationLabel[it.duration]} —
+                                ${it.text.substring(0,40)}...
+                              </option>
+                            `).join('')}
+                        </select>
+                      ` : ''}
 
                       ${(s.items||[]).map(item => {
                         const fullItem = items.find(it => it._id === (item._id||item)) || item
@@ -252,21 +238,53 @@ function render() {
                         `
                       }).join('')}
 
-                      <!-- Aggiungi item -->
-                      ${items.filter(it => !(s.items||[]).some(si => (si._id||si) === it._id)).length > 0 ? `
-                        <select onchange="addItemToStep(${i}, this.value); this.value=''"
-                          class="input" style="margin-top:8px;font-size:12px">
-                          <option value="">+ Aggiungi testo...</option>
+                      <p style="font-size:10px;letter-spacing:.08em;color:var(--faint);
+                      text-transform:uppercase;margin-top:16px;margin-bottom:8px">
+                      Testi approfondimenti (${(s.optionalItems||[]).length})
+                      </p>
+
+                      ${items.filter(it =>
+                      !(s.items||[]).some(si => (si._id||si) === it._id) &&
+                      !(s.optionalItems||[]).some(si => (si._id||si) === it._id)
+                      ).length > 0 ? `
+                      <select onchange="addOptionalItem(${i}, this.value); this.value=''"
+                          class="input" style="margin-bottom:8px;font-size:12px">
+                          <option value="">+ Aggiungi testo opzionale...</option>
                           ${items
-                            .filter(it => !(s.items||[]).some(si => (si._id||si) === it._id))
-                            .map(it => `
+                          .filter(it =>
+                              !(s.items||[]).some(si => (si._id||si) === it._id) &&
+                              !(s.optionalItems||[]).some(si => (si._id||si) === it._id)
+                          )
+                          .map(it => `
                               <option value="${it._id}">
-                                ${levelMeta[it.level]?.label} · ${durationLabel[it.duration]} —
-                                ${it.text.substring(0,40)}...
+                              ${levelMeta[it.level]?.label} · ${durationLabel[it.duration]} —
+                              ${it.text.substring(0,40)}...
                               </option>
-                            `).join('')}
-                        </select>
+                          `).join('')}
+                      </select>
                       ` : ''}
+
+                      ${(s.optionalItems||[]).map(item => {
+                      const fullItem = items.find(it => it._id === (item._id||item)) || item
+                      return `
+                          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;overflow:hidden;min-width:0;
+                          padding:8px 10px;background:rgba(200,169,110,.03);border-radius:3px;
+                          border:1px dashed rgba(200,169,110,.2)">
+                          <span class="tag ${levelMeta[fullItem.level]?.cls}" style="flex-shrink:0">
+                              ${levelMeta[fullItem.level]?.label||fullItem.level}
+                          </span>
+                          <span class="tag" style="background:rgba(200,169,110,.08);color:var(--gold);flex-shrink:0">
+                              ${durationLabel[fullItem.duration]||fullItem.duration}
+                          </span>
+                          <p style="font-size:12px;color:var(--muted);flex:1;min-width:0;max-width:400px;
+                              white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                              ${fullItem.text||''}
+                          </p>
+                          <button onclick="removeOptionalItem(${i}, '${item._id||item}')"
+                              style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px">✕</button>
+                          </div>
+                      `
+                      }).join('')}
                     </div>
                   </div>
                 `
