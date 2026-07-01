@@ -2,10 +2,18 @@
   "id": "galleria-estense",
   "name": "Galleria Estense",
   "shortName": "Estense",
-  "primaryColor": "#e91e8c",
+  "primaryColor": "#C8A96E",
+  "city": "Modena",
   "address": "Largo Porta Sant'Agostino 337, Modena",
   "ticketPrice": "10€, ridotto 5€",
-  "openingHours": "Martedì–domenica 8:15–19:30",
+  "openingHours": "Martedì-domenica 8:15-19:30",
+  "planimetryImage": "/planimetry-galleria-estense.jpg",
+  "pois": [
+    { "label": "🚪", "name": "Entrata", "x": 160, "y": 15 },
+    { "label": "🚨", "name": "Emergenza", "x": 280, "y": 440 },
+    { "label": "🚻", "name": "Bagni", "x": 290, "y": 180 },
+    { "label": "🛗", "name": "Ascensore", "x": 25, "y": 250 }
+  ],
   "places": {
     "uscita": "Uscita principale al piano terra, vicino all'ingresso da Largo Porta Sant'Agostino.",
     "toilette": "Bagni al piano terra, vicino all'ingresso principale.",

@@ -21,6 +21,9 @@ services:
     container_name: artaround-backoffice
     ports:
       - "3001:3001"
+    volumes:
+      - ./config:/config
+      - ./db-seed:/db-seed
     environment:
       - PORT=3001
       - MONGO_URI=mongodb://mongodb:27017/artaround

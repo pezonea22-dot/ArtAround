@@ -1,0 +1,32 @@
+[
+  {
+    "id": "galleria-estense",
+    "name": "Galleria Estense",
+    "shortName": "Estense",
+    "city": "Modena",
+    "primaryColor": "#C8A96E",
+    "works": 12,
+    "visits": 4,
+    "comingSoon": false
+  },
+  {
+    "id": "pinacoteca-nazionale",
+    "name": "Pinacoteca Nazionale",
+    "shortName": "Pinacoteca",
+    "city": "Bologna",
+    "primaryColor": "#5B9BD5",
+    "works": 4,
+    "visits": 1,
+    "comingSoon": false
+  },
+  {
+    "id": "mambo",
+    "name": "MAMbo",
+    "shortName": "MAMbo",
+    "city": "Bologna",
+    "primaryColor": "#5DB87A",
+    "works": 0,
+    "visits": 0,
+    "comingSoon": true
+  }
+]

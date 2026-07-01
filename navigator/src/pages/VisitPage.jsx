@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
-import { getMuseumConfig } from '../api/museum'
 import api from '../api/client'
 
 const levelOrder = ['infantile', 'semplice', 'medio', 'avanzato']
@@ -38,7 +37,7 @@ const VOICE_COMMANDS = {
 export default function VisitPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { profile } = useUser()
+  const { profile, museumConfig } = useUser()
 
   const [visit, setVisit]           = useState(null)
   const [loading, setLoading]       = useState(true)
@@ -56,19 +55,31 @@ export default function VisitPage() {
   const synthRef = useRef(window.speechSynthesis)
   const recRef   = useRef(null)
 
+  const museumName = museumConfig?.name || 'Museo'
+
   useEffect(() => {
-    Promise.all([
-      api.get(`/api/visits/${id}`),
-      getMuseumConfig()
-    ]).then(async ([r, config]) => {
+    api.get(`/api/visits/${id}`).then(r => {
       setVisit(r.data)
-      setPlaces(config.places || {})
+      setPlaces(museumConfig?.places || {})
       const intro = r.data.logistics?.find(l => l.afterStepIndex === -1)
       if (intro) setLogistic(intro.text)
-
     }).finally(() => setLoading(false))
     return () => { synthRef.current.cancel(); recRef.current?.stop() }
   }, [id])
+
+  useEffect(() => {
+    if (!visit || availableLevels.length === 0) return
+    if (!availableLevels.includes(currentLevel)) {
+      const idx = levelOrder.indexOf(currentLevel)
+      for (let i = idx; i >= 0; i--) {
+        if (availableLevels.includes(levelOrder[i])) {
+          setLevel(levelOrder[i])
+          return
+        }
+      }
+      setLevel(availableLevels[0])
+    }
+  }, [visit, stepIndex, currentLevel])
 
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -91,7 +102,7 @@ export default function VisitPage() {
   if (loading) return (
     <div style={{ minHeight: '100dvh', background: '#0a0e0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <p style={{ fontFamily: 'Cormorant Garant, serif', fontSize: 28, color: '#C8A96E', fontStyle: 'italic', marginBottom: 8 }}>Galleria Estense</p>
+        <p style={{ fontFamily: 'Cormorant Garant, serif', fontSize: 28, color: '#C8A96E', fontStyle: 'italic', marginBottom: 8 }}>{museumName}</p>
         <p style={{ fontSize: 13, color: '#4A4238' }}>Caricamento visita...</p>
       </div>
     </div>
@@ -107,13 +118,16 @@ export default function VisitPage() {
   const object   = step?.objectId
   const items    = step?.items || []
   const optionalItems = step?.optionalItems || []
-  const curItem  = pickItem(items, currentLevel)
-  const currentIdx  = levelOrder.indexOf(currentLevel)
-  const hasLevel    = l => items.some(i => i.level === l)
-  const canGoLess   = currentIdx > 0 && hasLevel(levelOrder[currentIdx - 1])
-  const canGoMore   = currentIdx < 3 && hasLevel(levelOrder[currentIdx + 1])
+  const curItem       = pickItem(items, currentLevel)
+  const hasLevel      = l => items.some(i => i.level === l)
+  const availableLevels = levelOrder.filter(l => hasLevel(l))
+  const availIdx      = availableLevels.indexOf(currentLevel)
+  const canGoLess     = availIdx > 0
+  const canGoMore     = availIdx >= 0 && availIdx < availableLevels.length - 1
   const isFirst  = stepIndex === 0
   const isLast   = stepIndex === visit.steps.length - 1
+
+  const pois = museumConfig?.pois || []
 
   const getLogAfter = idx => visit.logistics?.find(l => l.afterStepIndex === idx)
 
@@ -142,6 +156,7 @@ export default function VisitPage() {
       stop:   stopSpeak,
       author: () => showInfo(object ? `Autore: ${object.artist}, ${object.year}.` : 'Non disponibile.'),
       whatis: () => showInfo(object ? `"${object.title}" di ${object.artist}, ${object.year}. ${object.room}.` : 'Non disponibile.'),
+      style: () => showInfo(object?.style ? `Stile: ${object.style}.` : 'Informazione sullo stile non disponibile.'),
     }
     if (actions[cmd]) { actions[cmd](); return }
     if (cmd.startsWith('place_')) showInfo(museumPlaces[cmd.replace('place_', '')] || 'Informazione non disponibile.')
@@ -154,8 +169,14 @@ export default function VisitPage() {
     if (!isLast) setStepIndex(i => i + 1)
   }
   const goPrev = () => { stopSpeak(); setInfoMsg(null); setLogistic(null); if (!isFirst) setStepIndex(i => i - 1) }
-  const goMore = () => { const i = levelOrder.indexOf(currentLevel); if (i < 3) setLevel(levelOrder[i + 1]); setInfoMsg(null) }
-  const goLess = () => { const i = levelOrder.indexOf(currentLevel); if (i > 0) setLevel(levelOrder[i - 1]); setInfoMsg(null) }
+  const goMore = () => {
+    const i = availableLevels.indexOf(currentLevel)
+    if (i >= 0 && i < availableLevels.length - 1) { setLevel(availableLevels[i + 1]); setInfoMsg(null) }
+  }
+  const goLess = () => {
+    const i = availableLevels.indexOf(currentLevel)
+    if (i > 0) { setLevel(availableLevels[i - 1]); setInfoMsg(null) }
+  }
 
   const toggleVoice = () => {
     if (!recRef.current) return
@@ -184,25 +205,33 @@ export default function VisitPage() {
       <button onClick={() => setShowMap(false)} style={{ background: 'none', border: 'none', color: '#7A6E62', cursor: 'pointer', fontSize: 13, textAlign: 'left', marginBottom: 24 }}>← Torna</button>
       <p style={{ fontSize: 11, letterSpacing: '0.12em', color: '#C8A96E', textTransform: 'uppercase', marginBottom: 16 }}>Mappa percorso</p>
 
-      <div style={{ background: 'rgba(200,169,110,0.04)', border: '1px solid rgba(200,169,110,0.12)', borderRadius: 4, padding: 16, marginBottom: 20 }}>
-        <svg viewBox="0 0 320 480" style={{ width: '100%' }}>
+      <div style={{ background: 'rgba(200,169,110,0.04)', border: '1px solid rgba(200,169,110,0.12)', borderRadius: 4, marginBottom: 20, overflow: 'hidden' }}>
+        <svg viewBox="0 0 320 480" style={{ width: '100%', display: 'block' }}>
+          <image href={museumConfig?.planimetryImage || '/016PalazzoMuseiPiantina.jpg'} x={0} y={0} width={320} height={480} preserveAspectRatio="xMidYMid meet" />
+
+          {pois.map((place, i) => (
+            <g key={`place-${i}`}>
+              <circle cx={place.x} cy={place.y} r={7} fill={place.color || '#C8A96E'} opacity={0.85} />
+              <text x={place.x} y={place.y + 3.5} textAnchor="middle" fontSize={7} fill="white" fontWeight={700}>{place.label}</text>
+              <text x={place.x + 11} y={place.y + 3} fontSize={5.5} fill="#1A1612" fontFamily="Inter, sans-serif" fontWeight={600}>{place.name}</text>
+            </g>
+          ))}
+
           {visit.steps.map((s, i) => {
             const o = s.objectId
             if (!o?.position) return null
-            const x = (o.position.x / 320) * 290 + 15
-            const y = (o.position.y / 480) * 450 + 15
+            const x = o.position.x
+            const y = o.position.y
             const cur = i === stepIndex
             return (
               <g key={i} onClick={() => { setStepIndex(i); setShowMap(false) }} style={{ cursor: 'pointer' }}>
                 {i > 0 && (() => {
                   const prev = visit.steps[i - 1].objectId
                   if (!prev?.position) return null
-                  const px = (prev.position.x / 320) * 290 + 15
-                  const py = (prev.position.y / 480) * 450 + 15
-                  return <line x1={px} y1={py} x2={x} y2={y} stroke="rgba(200,169,110,0.2)" strokeWidth={1} strokeDasharray="4 3" />
+                  return <line x1={prev.position.x} y1={prev.position.y} x2={x} y2={y} stroke="rgba(200,169,110,0.6)" strokeWidth={2} strokeDasharray="5 4" />
                 })()}
-                <circle cx={x} cy={y} r={cur ? 13 : 9} fill={cur ? '#C8A96E' : '#2A2318'} stroke={cur ? '#F2E8D9' : 'rgba(200,169,110,0.3)'} strokeWidth={cur ? 2 : 1} />
-                <text x={x} y={y + 4} textAnchor="middle" fontSize={cur ? 9 : 7} fill={cur ? '#0E0C0A' : '#7A6E62'} fontWeight="700">{i + 1}</text>
+                <circle cx={x} cy={y} r={cur ? 13 : 9} fill={cur ? '#C8A96E' : 'rgba(20,18,16,0.75)'} stroke={cur ? '#F2E8D9' : 'rgba(200,169,110,0.5)'} strokeWidth={cur ? 2.5 : 1.5} />
+                <text x={x} y={y + 4} textAnchor="middle" fontSize={cur ? 9 : 7} fill={cur ? '#0E0C0A' : '#F2E8D9'} fontWeight="700">{i + 1}</text>
               </g>
             )
           })}
@@ -275,16 +304,16 @@ export default function VisitPage() {
             </div>
           )}
 
-          {/* Selettore livello */}
+          {/* Indicatore livello */}
           <div style={{ display: 'flex', gap: 1, marginBottom: 16, background: '#1A1612', borderRadius: 3, padding: 3 }}>
-            {levelOrder.map(l => (
-              <button key={l} onClick={() => { setLevel(l); setInfoMsg(null) }} style={{
-                flex: 1, padding: '7px 4px', borderRadius: 2, border: 'none',
+            {availableLevels.map(l => (
+              <div key={l} style={{
+                flex: 1, padding: '7px 4px', borderRadius: 2,
                 background: currentLevel === l ? '#C8A96E' : 'transparent',
                 color: currentLevel === l ? '#0E0C0A' : '#4A4238',
-                fontSize: 11, cursor: 'pointer', fontWeight: 600,
+                fontSize: 11, fontWeight: 600, textAlign: 'center',
                 transition: 'all .15s'
-              }}>{levelLabel[l]}</button>
+              }}>{levelLabel[l]}</div>
             ))}
           </div>
 
@@ -356,8 +385,8 @@ export default function VisitPage() {
                 ['Più approfondito', 'more'],
                 ["Chi è l'autore", 'author'],
                 ["Cos'è questo", 'whatis'],
-                ['Non capisco', 'less'],
-                ['Troppo semplice', 'more'],
+                ["Qual è lo stile", 'style'],
+                ["Ci sono ostacoli", 'place_ostacoli'],
               ].map(([label, cmd]) => {
                 const disabled = (cmd === 'less' && !canGoLess) || (cmd === 'more' && !canGoMore)
                 return (

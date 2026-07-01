@@ -10,9 +10,6 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {
-    "alpinejs": "^3.15.12"
-  },
   "devDependencies": {
     "serve": "^14.2.6"
   }

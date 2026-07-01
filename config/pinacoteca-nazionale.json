@@ -1,0 +1,25 @@
+{
+  "id": "pinacoteca-nazionale",
+  "name": "Pinacoteca Nazionale",
+  "shortName": "Pinacoteca",
+  "primaryColor": "#5B9BD5",
+  "city": "Bologna",
+  "address": "Via delle Belle Arti 56, 40126 Bologna",
+  "ticketPrice": "10€, ridotto 5€ (18-25 anni), gratuito under 18",
+  "openingHours": "Martedì-domenica 9:00-19:00 (ultimo ingresso 18:15)",
+  "planimetryImage": "/planimetry-pinacoteca-nazionale.svg",
+  "pois": [
+    { "label": "🚪", "name": "Entrata", "x": 640, "y": 830 },
+    { "label": "🚨", "name": "Emergenza", "x": 640, "y": 580 },
+    { "label": "🚻", "name": "Bagni", "x": 1150, "y": 560 },
+    { "label": "🛗", "name": "Ascensore", "x": 1150, "y": 620 }
+  ],
+  "places": {
+    "uscita": "Uscita principale su Via delle Belle Arti, al termine del percorso espositivo.",
+    "toilette": "Bagni al piano terra, vicino all'ingresso e alla biglietteria.",
+    "bar": "Non è presente un bar interno. Bar e caffetterie nelle vicinanze in Via delle Belle Arti e Via Irnerio.",
+    "shop": "Bookshop al piano terra, all'ingresso del museo.",
+    "ostacoli": "L'ascensore potrebbe essere soggetto a temporanei malfunzionamenti. Scale con gradini tra alcune sale.",
+    "emergenza": "Uscite di emergenza segnalate in ogni sala con cartelli verdi. Punto di raccolta esterno su Via delle Belle Arti."
+  }
+}

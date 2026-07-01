@@ -13,6 +13,15 @@ export function UserProvider({ children }) {
     return saved ? JSON.parse(saved) : null
   })
 
+  const [museumId, setMuseumId] = useState(() => {
+    return localStorage.getItem('museumId') || 'galleria-estense'
+  })
+
+  const [museumConfig, setMuseumConfig] = useState(() => {
+    const saved = localStorage.getItem('museumConfig')
+    return saved ? JSON.parse(saved) : null
+  })
+
   const login = (userData, token) => {
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
@@ -30,8 +39,15 @@ export function UserProvider({ children }) {
     setProfile(profileData)
   }
 
+  const selectMuseum = (id, config) => {
+    localStorage.setItem('museumId', id)
+    localStorage.setItem('museumConfig', JSON.stringify(config))
+    setMuseumId(id)
+    setMuseumConfig(config)
+  }
+
   return (
-    <UserContext.Provider value={{ user, profile, login, logout, saveProfile }}>
+    <UserContext.Provider value={{ user, profile, museumId, museumConfig, login, logout, saveProfile, selectMuseum }}>
       {children}
     </UserContext.Provider>
   )

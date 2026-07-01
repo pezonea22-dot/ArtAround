@@ -11,6 +11,7 @@ const museumObjectSchema = new mongoose.Schema({
     y: Number
   },
   image: String,
+  style: String,
   museumId: { type: String, required: true }
 }, { timestamps: true })
 

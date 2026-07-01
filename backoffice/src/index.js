@@ -32,8 +32,17 @@ app.use('/api/items', require('./routes/items'))
 app.use('/api/visits', require('./routes/visits'))
 app.use('/api/marketplace', require('./routes/marketplace'))
 
+app.get('/museums', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../../config/museums.json'))
+})
+
 app.get('/museum-config', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../config/museum.json'))
+  const id = req.query.id
+  if (id) {
+    res.sendFile(path.resolve(__dirname, `../../config/${id}.json`))
+  } else {
+    res.sendFile(path.resolve(__dirname, '../../config/galleria-estense.json'))
+  }
 })
 
 app.get('/', (req, res) => res.json({ status: 'ok', app: 'ArtAround API' }))

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
-import { getMuseumConfig } from '../api/museum'
 import api from '../api/client'
 
 const levelMeta = {
@@ -14,27 +13,26 @@ const levelMeta = {
 export default function VisitsPage() {
   const [visits, setVisits]   = useState([])
   const [loading, setLoading] = useState(true)
-  const { profile } = useUser()
+  const { profile, museumId, museumConfig } = useUser()
   const navigate = useNavigate()
+  const museumName = museumConfig?.name || 'Museo'
 
   useEffect(() => {
-    getMuseumConfig().then(config => {
-      api.get(`/api/marketplace/visits?museumId=${config.id}`)
-        .then(r => {
-          let filtered = r.data
-          if (profile?.time) {
-            filtered = filtered.filter(v => parseInt(v.estimatedDuration) <= profile.time)
-          }
-          if (profile?.level) {
-            const order = ['infantile', 'semplice', 'medio', 'avanzato']
-            const userIdx = order.indexOf(profile.level)
-            filtered = filtered.filter(v => order.indexOf(v.targetLevel) <= userIdx)
-          }
-          setVisits(filtered)
-        })
-        .finally(() => setLoading(false))
-    })
-  }, [])
+    api.get(`/api/marketplace/visits?museumId=${museumId}`)
+      .then(r => {
+        let filtered = r.data
+        if (profile?.time) {
+          filtered = filtered.filter(v => parseInt(v.estimatedDuration) <= profile.time)
+        }
+        if (profile?.level) {
+          const order = ['infantile', 'semplice', 'medio', 'avanzato']
+          const userIdx = order.indexOf(profile.level)
+          filtered = filtered.filter(v => order.indexOf(v.targetLevel) <= userIdx)
+        }
+        setVisits(filtered)
+      })
+      .finally(() => setLoading(false))
+  }, [museumId])
 
   return (
     <div style={{ minHeight: '100dvh', background: '#0E0C0A', display: 'flex', flexDirection: 'column' }}>
@@ -47,7 +45,7 @@ export default function VisitsPage() {
         }}>← Indietro</button>
 
         <p style={{ fontSize: 11, letterSpacing: '0.12em', color: '#C8A96E', textTransform: 'uppercase', marginBottom: 8 }}>
-          Galleria Estense
+          {museumName}
         </p>
         <h2 style={{ fontFamily: 'Cormorant Garant, serif', fontSize: 32, fontWeight: 400, color: '#F2E8D9', marginBottom: 6 }}>
           Scegli un percorso
@@ -91,7 +89,6 @@ export default function VisitsPage() {
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'; e.currentTarget.style.background = 'rgba(200,169,110,0.04)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.12)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
             >
-              {/* Numero percorso */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'Cormorant Garant, serif', fontSize: 13, color: '#4A4238', fontStyle: 'italic' }}>
                   Percorso {String(i + 1).padStart(2, '0')}
